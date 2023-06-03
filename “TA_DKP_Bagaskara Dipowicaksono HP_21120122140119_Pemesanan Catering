@@ -1,0 +1,92 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class OrderFoodGUI:
+    def __init__(self, master):
+        self.master = master
+        master.title("Program Pemesanan Catering")
+        window_width = 500
+        window_height = 300
+        screen_width = master.winfo_screenwidth()
+        screen_height = master.winfo_screenheight()
+        x = int((screen_width/2) - (window_width/2))
+        y = int((screen_height/2) - (window_height/2))
+        master.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+        self.food_price = {"Nasi Goreng": 20000, "Soto Ayam": 15000, "Ayam Bakar": 25000, "Sate Kambing": 30000}
+        self.order_history = []  # List untuk menyimpan riwayat pesanan
+
+        self.label = tk.Label(master, text="Silahkan Pesan")
+        self.label.pack()
+
+        main_frame = tk.Frame(master)
+        main_frame.pack(expand=True)
+
+        menu_frame = tk.Frame(main_frame)
+        menu_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+        self.display_menu(menu_frame)
+
+        input_frame = tk.Frame(main_frame)
+        input_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+        self.food_var = tk.StringVar(master)
+        self.food_var.set("Pilih Makanan")
+        self.food_label = tk.Label(input_frame, text="Makanan:")
+        self.food_label.pack()
+
+        self.food_option = tk.OptionMenu(input_frame, self.food_var, *self.food_price.keys())
+        self.food_option.pack()
+
+        self.quantity_var = tk.StringVar(master)
+        self.quantity_label = tk.Label(input_frame, text="Jumlah:")
+        self.quantity_label.pack()
+
+        self.quantity_entry = tk.Entry(input_frame, textvariable=self.quantity_var)
+        self.quantity_entry.pack()
+
+        self.order_button = tk.Button(input_frame, text="Order", command=self.add_order)
+        self.order_button.pack(pady=10)
+
+        self.history_button = tk.Button(master, text="Riwayat Pesanan", command=self.show_order_history)
+        self.history_button.pack()
+
+    def display_menu(self, frame):
+        menu_title = tk.Label(frame, text="Daftar Menu")
+        menu_title.pack()
+
+        menu_text = ""
+        for food, price in self.food_price.items():
+            menu_text += f"{food}: Rp {price}\n"
+        menu_label = tk.Label(frame, text=menu_text)
+        menu_label.pack()
+
+    def add_order(self):
+        food = self.food_var.get()
+        quantity = self.quantity_var.get()
+
+        if not quantity.isdigit():
+            messagebox.showerror("Error", "Jumlah pesanan harus berupa angka!")
+            return
+
+        order = {"food": food, "quantity": quantity}
+        self.order_history.append(order)
+
+        total_price = int(quantity) * self.food_price[food]
+        messagebox.showinfo("Total Harga", f"Total harga pesanan untuk {quantity} porsi {food} adalah {total_price}")
+
+    def show_order_history(self):
+        if not self.order_history:
+            messagebox.showinfo("Riwayat Pesanan", "Belum ada pesanan.")
+        else:
+            history_text = "Riwayat Pesanan:\n"
+            for order in self.order_history:
+                food = order["food"]
+                quantity = order["quantity"]
+                history_text += f"{food}: {quantity} porsi\n"
+
+            messagebox.showinfo("Riwayat Pesanan", history_text)
+
+root = tk.Tk()
+my_gui = OrderFoodGUI(root)
+root.mainloop()
